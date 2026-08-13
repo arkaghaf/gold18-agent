@@ -1,0 +1,9 @@
+requests
+python-telegram-bot==21.6
+pandas
+numpy
+matplotlib
+ta
+schedule
+python-dotenv
+jdatetime
