@@ -1,5 +1,6 @@
 import os
 import time
+import asyncio
 import json
 import requests
 import pandas as pd
@@ -161,6 +162,16 @@ def format_message(price, change, indicators, jdate):
 
 
 # ==================== حلقه اصلی ====================
+async def send_notification(price, change, indicators, jdate, chart):
+    message = format_message(price, change, indicators, jdate)
+    await bot.send_photo(
+        chat_id=CHANNEL_ID,
+        photo=chart,
+        caption=message,
+        parse_mode="Markdown"
+    )
+
+
 def main():
     print("Agent started...")
     history = load_history()
@@ -195,18 +206,12 @@ def main():
             # فقط اگر تغییر معنادار بود نوتیف بده
             if last_sent_price is None or abs(change) >= MIN_CHANGE_TOMAN:
                 indicators = calculate_indicators(df)
-                chart = create_chart(df.tail(100), indicators)  # ۱۰۰ نقطه آخر
+                chart = create_chart(df.tail(100), indicators)
                 jdate = jdatetime.datetime.now().strftime("%Y/%m/%d - %H:%M")
 
-                message = format_message(price, change, indicators, jdate)
-
-                # ارسال به کانال
-                bot.send_photo(
-                    chat_id=CHANNEL_ID,
-                    photo=chart,
-                    caption=message,
-                    parse_mode="Markdown"
-                )
+                # ارسال async
+                asyncio.run(send_notification(price, change, indicators, jdate, chart))
+                
                 print(f"نوتیف ارسال شد | قیمت: {price:,}")
                 last_sent_price = price
             else:
