@@ -126,6 +126,14 @@ def format_message(price, change, indicators, jdate):
     change_emoji = "🟢" if change > 0 else "🔴" if change < 0 else "⚪"
     change_text = f"{change_emoji} {change:+,} تومان"
 
+    def fmt(val):
+        if val is None or val == "—":
+            return "—"
+        try:
+            return f"{int(val):,}"
+        except:
+            return str(val)
+
     text = f"""
 🏅 **طلای ۱۸ عیار**
 📅 {jdate}
@@ -135,11 +143,11 @@ def format_message(price, change, indicators, jdate):
 📈 **اندیکاتورها:**
 • RSI(14): `{indicators.get('RSI', '—')}`
 • ADX(14): `{indicators.get('ADX', '—')}`
-• SMA20: `{indicators.get('SMA20', '—'):,}`
-• EMA12: `{indicators.get('EMA12', '—'):,}`
+• SMA20: `{fmt(indicators.get('SMA20'))}`
+• EMA12: `{fmt(indicators.get('EMA12'))}`
 """
     if indicators.get("SMA50"):
-        text += f"• SMA50: `{indicators['SMA50']:,}`\n"
+        text += f"• SMA50: `{fmt(indicators.get('SMA50'))}`\n"
 
     # تفسیر ساده
     rsi = indicators.get("RSI")
